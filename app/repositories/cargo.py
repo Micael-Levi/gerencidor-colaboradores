@@ -45,11 +45,19 @@ class CargoRepository:
                 detail=f"{MensagensErro.ERRO_BANCO_DADOS}: {str(e)}",
             )
 
-    async def get_all(self):
+    async def get_all(self) -> list[Cargo]:
+        """
+        Lista todos os cargos
+        """
         queryset = await self.database.execute(select(Cargo))
         return queryset.scalars().all()
 
-    async def update(self, cargo_id: str, nome: str = None, codigo: str = None):
+    async def update(
+        self, cargo_id: str, nome: str = None, codigo: str = None
+    ) -> Cargo | None:
+        """
+        Atualiza nome e código de um cargo
+        """
         queryset = await self.database.execute(
             select(Cargo).where(Cargo.id == cargo_id)
         )
@@ -64,7 +72,10 @@ class CargoRepository:
         await self.database.refresh(cargo)
         return cargo
 
-    async def delete(self, cargo_id: str):
+    async def delete(self, cargo_id: str) -> Cargo | None:
+        """
+        Deleta logicamente um cargo
+        """
         queryset = await self.database.execute(
             select(Cargo).where(Cargo.id == cargo_id)
         )

@@ -12,7 +12,12 @@ from app.core.database import SessionLocal
 router = APIRouter()
 
 
-@router.post("/", response_model=ColaboradorRead)
+@router.post(
+    "/",
+    response_model=ColaboradorRead,
+    summary="Criar colaborador",
+    description="Registra um novo colaborador",
+)
 async def criar_colaborador(
     colaborador: ColaboradorCreate, database: AsyncSession = Depends(get_database)
 ):
@@ -20,13 +25,23 @@ async def criar_colaborador(
     return ColaboradorRead.from_orm(await repo.create(colaborador))
 
 
-@router.get("/", response_model=list[ColaboradorRead])
+@router.get(
+    "/",
+    response_model=list[ColaboradorRead],
+    summary="Listar colaboradores",
+    description="Retorna todos os colaboradores ativos",
+)
 async def listar_colaboradores(database: AsyncSession = Depends(get_database)):
     repo = ColaboradorRepository(database)
     return await repo.list()
 
 
-@router.get("/{colaborador_id}", response_model=ColaboradorRead)
+@router.get(
+    "/{colaborador_id}",
+    response_model=ColaboradorRead,
+    summary="Lista um colaborador",
+    description="Retorna todos os dados de um colaborador",
+)
 async def buscar_colaborador(
     colaborador_id: str, database: AsyncSession = Depends(get_database)
 ):
@@ -37,7 +52,12 @@ async def buscar_colaborador(
     return colaborador
 
 
-@router.patch("/{colaborador_id}", response_model=ColaboradorRead)
+@router.patch(
+    "/{colaborador_id}",
+    response_model=ColaboradorRead,
+    summary="Atualizar colaborador",
+    description="Atualiza os dados de um colaborador",
+)
 async def atualizar_colaborador(
     colaborador_id: str,
     data: ColaboradorUpdate,
@@ -52,7 +72,11 @@ async def atualizar_colaborador(
     return colaborador
 
 
-@router.delete("/{colaborador_id}")
+@router.delete(
+    "/{colaborador_id}",
+    summary="Deleta um colaborador",
+    description="Deleta logicamente um colaborador",
+)
 async def excluir_colaborador(
     colaborador_id: str, database: AsyncSession = Depends(get_database)
 ):

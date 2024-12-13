@@ -9,10 +9,17 @@ from fastapi import HTTPException
 
 
 class ColaboradorRepository:
+    """
+    Gerencia operações de CRUD de colaborades no banco.
+    """
+
     def __init__(self, database: AsyncSession):
         self.database = database
 
     async def create(self, colaborador_data):
+        """
+        Cria um novo colaborador
+        """
         try:
             novo_colaborador = Colaborador(**colaborador_data.dict())
             self.database.add(novo_colaborador)
@@ -40,12 +47,18 @@ class ColaboradorRepository:
             )
 
     async def list(self) -> list[Colaborador]:
+        """
+        Lista todos os colaboradores ativos
+        """
         result = await self.database.execute(
             select(Colaborador).filter(Colaborador.status_colaborador == True)
         )
         return result.scalars().all()
 
     async def get_by_id(self, colaborador_id: str) -> Colaborador | None:
+        """
+        Retorna um colaborador buscando por id
+        """
         result = await self.database.execute(
             select(Colaborador).filter(Colaborador.id == colaborador_id)
         )
@@ -54,6 +67,9 @@ class ColaboradorRepository:
     async def update(
         self, colaborador_id: str, data: ColaboradorUpdate
     ) -> Colaborador | None:
+        """
+        Atualiza dados de um colaborador
+        """
         colaborador = await self.database.get(Colaborador, colaborador_id)
         if not colaborador or not colaborador.status_colaborador:
             return None
@@ -64,6 +80,9 @@ class ColaboradorRepository:
         return colaborador
 
     async def delete(self, colaborador_id: str) -> bool:
+        """
+        Deleta logicamente um colaborador
+        """
         colaborador = await self.database.get(Colaborador, colaborador_id)
         if not colaborador or not colaborador.status_colaborador:
             return False
