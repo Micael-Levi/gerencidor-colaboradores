@@ -19,6 +19,7 @@ aiosqlite = "*"
 
 [dev-packages]
 debugpy = "*"
+black = "*"
 
 [requires]
 python_version = "3.11"
