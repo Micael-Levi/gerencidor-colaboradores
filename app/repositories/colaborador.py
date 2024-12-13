@@ -1,8 +1,11 @@
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from app.models.colaborador import Colaborador
 from app.schemas.colaborador import ColaboradorCreate, ColaboradorUpdate
 from sqlalchemy.orm import selectinload
+from app.core.utils.errors import MensagensErro
+from fastapi import HTTPException
 
 
 class ColaboradorRepository:
@@ -10,18 +13,31 @@ class ColaboradorRepository:
         self.database = database
 
     async def create(self, colaborador_data):
-        novo_colaborador = Colaborador(**colaborador_data.dict())
-        self.database.add(novo_colaborador)
-        await self.database.commit()
-        await self.database.refresh(novo_colaborador)
+        try:
+            novo_colaborador = Colaborador(**colaborador_data.dict())
+            self.database.add(novo_colaborador)
+            await self.database.commit()
+            await self.database.refresh(novo_colaborador)
 
-        query = (
-            select(Colaborador)
-            .options(selectinload(Colaborador.cargo))
-            .where(Colaborador.id == novo_colaborador.id)
-        )
-        result = await self.database.execute(query)
-        return result.scalar_one()
+            query = (
+                select(Colaborador)
+                .options(selectinload(Colaborador.cargo))
+                .where(Colaborador.id == novo_colaborador.id)
+            )
+            result = await self.database.execute(query)
+            return result.scalar_one()
+        except IntegrityError:
+            await self.database.rollback()
+            raise HTTPException(
+                status_code=400,
+                detail=MensagensErro.ERRO_INTEGRIDADE,
+            )
+        except SQLAlchemyError as e:
+            await self.database.rollback()
+            raise HTTPException(
+                status_code=500,
+                detail=f"{MensagensErro.ERRO_BANCO_DADOS}: {str(e)}",
+            )
 
     async def list(self) -> list[Colaborador]:
         result = await self.database.execute(

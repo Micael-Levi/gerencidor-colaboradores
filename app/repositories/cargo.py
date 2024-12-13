@@ -1,7 +1,10 @@
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from app.models import Cargo
 from app.schemas import CargoCreate
+from app.core.utils.errors import MensagensErro
+from fastapi import HTTPException
 
 
 class CargoRepository:
@@ -18,16 +21,29 @@ class CargoRepository:
         Aceita tanto objetos Pydantic quanto dicionários.
         """
 
-        if isinstance(cargo, dict):
-            novo_cargo = Cargo(**cargo)
-        else:
-            novo_cargo = Cargo(**cargo.dict())
+        try:
+            if isinstance(cargo, dict):
+                novo_cargo = Cargo(**cargo)
+            else:
+                novo_cargo = Cargo(**cargo.dict())
 
-        self.database.add(novo_cargo)
-        await self.database.commit()
-        await self.database.refresh(novo_cargo)
+            self.database.add(novo_cargo)
+            await self.database.commit()
+            await self.database.refresh(novo_cargo)
 
-        return novo_cargo
+            return novo_cargo
+        except IntegrityError:
+            await self.database.rollback()
+            raise HTTPException(
+                status_code=400,
+                detail=MensagensErro.ERRO_INTEGRIDADE,
+            )
+        except SQLAlchemyError as e:
+            await self.database.rollback()
+            raise HTTPException(
+                status_code=500,
+                detail=f"{MensagensErro.ERRO_BANCO_DADOS}: {str(e)}",
+            )
 
     async def get_all(self):
         queryset = await self.database.execute(select(Cargo))
