@@ -24,7 +24,7 @@ async def list_jobs(db: AsyncSession = Depends(get_database)):
 
 @router.post(
     "/",
-    response_model=CargoCreate,
+    response_model=CargoRead,
     summary="Criar cargo",
     description="Cria um novo cargo",
 )
