@@ -76,6 +76,8 @@ Obs: DATABASE_HOST e DATABASE_PORT devem ter o valor apresentado no exemplo
    pipenv install
    ```
 
+2. Crie o banco de dados local.
+
 2. Configure as variáveis de ambiente no sistema ou em um arquivo `.env`.
 
 3. Execute a aplicação:
