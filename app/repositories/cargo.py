@@ -12,8 +12,16 @@ class CargoRepository:
     def __init__(self, database: AsyncSession):
         self.database = database
 
-    async def create(self, cargo: CargoCreate):
-        novo_cargo = Cargo(**cargo.dict())
+    async def create(self, cargo: CargoCreate | dict):
+        """
+        Cria um novo cargo.
+        Aceita tanto objetos Pydantic quanto dicionários.
+        """
+
+        if isinstance(cargo, dict):
+            novo_cargo = Cargo(**cargo)
+        else:
+            novo_cargo = Cargo(**cargo.dict())
 
         self.database.add(novo_cargo)
         await self.database.commit()
