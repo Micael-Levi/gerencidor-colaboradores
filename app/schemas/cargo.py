@@ -38,5 +38,3 @@ class CargoRead(BaseModel):
 class CargoUpdate(BaseModel):
     nome: str | None = Field(None, min_length=3, max_length=50)
     codigo: str | None = Field(None, min_length=2, max_length=10)
-
-

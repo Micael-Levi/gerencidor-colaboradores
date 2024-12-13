@@ -14,12 +14,12 @@ router = APIRouter()
     summary="Listar cargos",
     description="Retorna todos os cargos",
 )
-async def list_jobs(db: AsyncSession = Depends(get_database)):
+async def listar_cargo(database: AsyncSession = Depends(get_database)):
     """
     Endpoint para listar todos os cargos.
     """
-    repo = CargoRepository(db)
-    return await repo.get_all()  # Adicione await aqui
+    repository = CargoRepository(database)
+    return await repository.get_all()
 
 
 @router.post(
