@@ -15,6 +15,7 @@ pydantic = "*"
 asyncpg = "*"
 pydantic-settings = "*"
 python-dotenv = "*"
+aiosqlite = "*"
 
 [dev-packages]
 debugpy = "*"
