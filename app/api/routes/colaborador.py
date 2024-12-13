@@ -6,6 +6,7 @@ from app.schemas.colaborador import (
     ColaboradorCreate,
     ColaboradorUpdate,
     ColaboradorRead,
+    ColaboradorReadFull,
 )
 from app.core.database import SessionLocal
 
@@ -38,7 +39,7 @@ async def listar_colaboradores(database: AsyncSession = Depends(get_database)):
 
 @router.get(
     "/{colaborador_id}",
-    response_model=ColaboradorRead,
+    response_model=ColaboradorReadFull,
     summary="Lista um colaborador",
     description="Retorna todos os dados de um colaborador",
 )

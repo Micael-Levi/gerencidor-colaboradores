@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from app.models.colaborador import Colaborador
 from app.schemas.colaborador import ColaboradorCreate, ColaboradorUpdate
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import selectinload, joinedload
 from app.core.utils.errors import MensagensErro
 from fastapi import HTTPException
 
@@ -57,12 +57,24 @@ class ColaboradorRepository:
 
     async def get_by_id(self, colaborador_id: str) -> Colaborador | None:
         """
-        Retorna um colaborador buscando por id
+        Retorna um colaborador por ID, incluindo relações de cargo e líder
         """
-        result = await self.database.execute(
-            select(Colaborador).filter(Colaborador.id == colaborador_id)
-        )
-        return result.scalar_one_or_none()
+        try:
+            query = (
+                select(Colaborador)
+                .options(
+                    joinedload(Colaborador.cargo),
+                    joinedload(Colaborador.lider),
+                )
+                .where(Colaborador.id == colaborador_id)
+            )
+            result = await self.database.execute(query)
+            return result.scalar_one_or_none()
+        except SQLAlchemyError as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"{MensagensErro.ERRO_BANCO_DADOS}: {str(e)}",
+            )
 
     async def update(
         self, colaborador_id: str, data: ColaboradorUpdate

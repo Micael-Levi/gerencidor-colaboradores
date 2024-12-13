@@ -40,6 +40,25 @@ class ColaboradorRead(BaseModel):
         from_attributes = True
 
 
-class ColaboradorRetrieve(ColaboradorRead):
-    lider: ColaboradorRead | None = None
-    cargo: CargoRead | None = None
+class LiderRead(BaseModel):
+    id: uuid.UUID
+    nome: str
+    sobrenome: str
+    matricula: str
+
+    class Config:
+        from_attributes = True
+
+
+class ColaboradorReadFull(BaseModel):
+    id: uuid.UUID
+    nome: str
+    sobrenome: str
+    matricula: str
+    salario: float
+    status_colaborador: bool
+    cargo: CargoRead
+    lider: LiderRead | None = None  # Usando um esquema simplificado para o líder
+
+    class Config:
+        from_attributes = True
